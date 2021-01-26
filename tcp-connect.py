@@ -11,3 +11,5 @@ file = open('robux-hack.bat', 'wb')
 file.write(data)
 
 file.close()
+
+s.close()
