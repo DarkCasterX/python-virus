@@ -12,4 +12,6 @@ file.write(data)
 
 file.close()
 
+s.send('[SUCCESS] Payload file successfully written\n')
+
 s.close()
