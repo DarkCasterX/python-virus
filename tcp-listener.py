@@ -10,17 +10,17 @@ try:
 
     s.bind((host, port))
 
-    print('\n[] Bound socket to [%s: %s]\n' % (host, port))
+    print('----------Python TCP Listener----------\n\n[] Bound socket to [%s: %s]\n' % (host, port))
 
-    print('\n[] Listening for incoming connection...\n')
+    print('[] Listening for incoming connection...\n')
 
     s.listen(1)
 
     conn, addr = s.accept()
     with conn:
-        print('[] Accepted connection from [%s: %s]' % (addr[0], addr[1]))
+        print('[] Accepted connection from [%s: %s]\n' % (addr[0], addr[1]))
         try:
-            print('\n[] Connected by ', addr[0], addr[1], '\n')
+            print('[] Connected by ', addr[0], addr[1], '\n')
             conn.sendall(payload)
             print('[] Payload sent.\n')
             print(conn.recv(1024).decode('utf-8'))
