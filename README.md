@@ -1,7 +1,8 @@
 # python-virus
+
 I'm not an exploit dev. Just kicking some tires
 
-# Short description
+## Short description
 
 The tcp-listener opens a socket on a port, and upon accepting a connection, sends a bunch of data to it. By default, it sends a short batch script that's basically a fork bomb on Windows.
 

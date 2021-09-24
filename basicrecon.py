@@ -79,32 +79,7 @@ def NiktoScan():
     except Exception as e:
         print("Error occured", e)
 
-def main():
-    is_web_server = False
-    #Print banner
-    print(banner)
-
-    #Parse arguments
-    parser = argparse.ArgumentParser()
-    parser.add_argument('ip', help="IP address of server to recon")
-    parser.add_argument('dirlist', help="Path of directory wordlist you want to use")
-    parser.add_argument('-d', '--domain', nargs="?", default="", help="optional domain name to use for scanners default: none")
-    parser.add_argument('-n', '--do-dns', action="store_true", help="do dns scanning")
-    parser.add_argument('-l', '--dns-list', nargs="?", help="wordlist to use for DNS scanning")
-    parser.add_argument('-k', '--do-nikto', action="store_true", help="run nikto scan")
-    parser.add_argument('-t', '--no-prompt', action="store_true", help="Disable unnecessary prompts (yes or no) default: yes")
-    parser.add_argument('-p', '--port', nargs='?', default=None, help="Specify port to scan")
-    args = parser.parse_args()
-
-    #Store arguments
-    ip = args.ip
-    dirwordlist = args.dirlist
-    noprompt = args.no_prompt
-    domainname = args.domain
-    dnslist = args.dns_list
-    port = args.port
-
-    #Run nmap scan to check if port 80 is open
+def checkForWebserver(port, noprompt, ip):
     try:
         NmapScan(noprompt, ip)
         if port is None:
@@ -118,16 +93,19 @@ def main():
             
             for open_port in open_ports:
                 if int(open_port) == 80 or int(open_port) == 443:
-                    is_web_server = True
                     print("Port 80 or 443 is open, server is likely hosting a web server")
+                    return True
+                else:
+                    return False
 
         if port is not None:
             print("You specified a port in arguments. Assuming there is a web server running on that port.")
-            is_web_server = True
+            return True
     except Exception as e:
         print("Error occured", e)
+        return False
 
-    #Check is web server is open
+def webServerScan(is_web_server, noprompt, dirwordlist, ip, domainname, port, args, dnslist):
     if is_web_server == True:
         #Run scans
         try:
@@ -160,6 +138,37 @@ def main():
             print("Something went wrong: ", e)
     else:
         print("[!] Host does not have a web server open")
+
+def main():
+    #Print banner
+    print(banner)
+
+    #Parse arguments
+    parser = argparse.ArgumentParser()
+    parser.add_argument('ip', help="IP address of server to recon")
+    parser.add_argument('dirlist', help="Path of directory wordlist you want to use")
+    parser.add_argument('-d', '--domain', nargs="?", default="", help="optional domain name to use for scanners default: none")
+    parser.add_argument('-n', '--do-dns', action="store_true", help="do dns scanning")
+    parser.add_argument('-l', '--dns-list', nargs="?", help="wordlist to use for DNS scanning")
+    parser.add_argument('-k', '--do-nikto', action="store_true", help="run nikto scan")
+    parser.add_argument('-t', '--no-prompt', action="store_true", help="Disable unnecessary prompts (yes or no) default: yes")
+    parser.add_argument('-p', '--port', nargs='?', default=None, help="Specify port to scan")
+    args = parser.parse_args()
+
+    #Store arguments
+    ip = args.ip
+    dirwordlist = args.dirlist
+    noprompt = args.no_prompt
+    domainname = args.domain
+    dnslist = args.dns_list
+    port = args.port
+
+    #Run nmap scan to check if port 80 is open
+    is_web_server = checkForWebserver(port, noprompt, ip)    
+
+    #Check is web server is open
+    webServerScan(is_web_server, noprompt, dirwordlist, ip, domainname, port, args, dnslist)
+    
 
 if __name__ == "__main__":
     main()
