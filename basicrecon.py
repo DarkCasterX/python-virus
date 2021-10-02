@@ -178,10 +178,15 @@ def main():
 
     #Run nmap scan to check if port 80 is open
     if args.skip_nmap is False:
-        is_web_server = checkForWebserver(port, noprompt, ip)    
+        is_web_server = checkForWebserver(port, noprompt, ip)
+        
+        #Scan the web server
+        webServerScan(is_web_server, noprompt, dirwordlist, ip, domainname, port, args, dnslist)
 
-    #Scan the web server
-    webServerScan(is_web_server, noprompt, dirwordlist, ip, domainname, port, args, dnslist)
+    else:
+        webServerScan(True, noprompt, dirwordlist, ip, domainname, port, args, dnslist)
+
+    
     
 
 if __name__ == "__main__":
