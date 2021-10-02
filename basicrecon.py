@@ -165,6 +165,7 @@ def main():
     parser.add_argument('-k', '--do-nikto', action="store_true", help="run nikto scan")
     parser.add_argument('-t', '--no-prompt', action="store_true", help="Disable unnecessary prompts (yes or no) default: yes")
     parser.add_argument('-p', '--port', nargs='?', default=None, help="Specify port to scan")
+    parser.add_argument('-s', '--skip-nmap', action="store_true", help="Skip Nmap scan")
     args = parser.parse_args()
 
     #Store arguments
@@ -176,9 +177,10 @@ def main():
     port = args.port
 
     #Run nmap scan to check if port 80 is open
-    is_web_server = checkForWebserver(port, noprompt, ip)    
+    if args.skip_nmap is False:
+        is_web_server = checkForWebserver(port, noprompt, ip)    
 
-    #Check is web server is open
+    #Scan the web server
     webServerScan(is_web_server, noprompt, dirwordlist, ip, domainname, port, args, dnslist)
     
 
