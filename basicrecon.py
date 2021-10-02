@@ -70,7 +70,7 @@ def DNSScan(domain, list, *args, **kwargs):
 def VHostScan(url, list, *args, **kwargs):
     print("Running VHOST Scan...")
     try:
-        os.system(f"gobuster vhost -u {url} -w {list} -o vhost-scan-resulsts.txt -q >/dev/null")
+        os.system(f"gobuster vhost -u {url} -w {list} -o vhost-scan-results.txt -q >/dev/null")
     except KeyboardInterrupt:
         print("Keyboard interrupt detected")
     except ValueError:
