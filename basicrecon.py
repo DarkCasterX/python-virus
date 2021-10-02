@@ -67,6 +67,17 @@ def DNSScan(domain, list, *args, **kwargs):
     except Exception as e:
         print("Error occured", e)
 
+def VHostScan(url, list, *args, **kwargs):
+    print("Running VHOST Scan...")
+    try:
+        os.system(f"gobuster vhost -u {url} -w {list} -o vhost-scan-resulsts.txt -q >/dev/null")
+    except KeyboardInterrupt:
+        print("Keyboard interrupt detected")
+    except ValueError:
+        print("Bad value")
+    except Exception as e:
+        print("Error occured", e)
+
 #Run nikto scan
 def NiktoScan():
     try:
@@ -118,9 +129,10 @@ def webServerScan(is_web_server, noprompt, dirwordlist, ip, domainname, port, ar
                 if dnslist is None:
                     print("No wordlist specified for DNS scan.")
                 else:
-                    wordlist = args.dns_list
-                    dns_scan = Thread(target=DNSScan, args=(domainname, wordlist))
+                    dns_scan = Thread(target=DNSScan, args=(domainname, dnslist))
+                    vhost_scan = Thread(target=VHostScan, args=(domainname, dnslist))
                     running_threads.append(dns_scan)
+                    running_threads.append(vhost_scan)
             if args.do_nikto:
                 nikto_scan = Thread(target=NiktoScan)
                 running_threads.append(nikto_scan)
