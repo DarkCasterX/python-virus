@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+from os import path
 import argparse
 from threading import Thread
 import xml.etree.ElementTree as ET
@@ -21,12 +22,14 @@ running_threads = []
 #Run Nmap scan
 def NmapScan(noprompt, ip):
     print("Running Nmap scan... (Nmap may require sudo privileges)")
-    os.system(f"sudo nmap -sS -sV -A {ip} -oA nmap-scan >/dev/null")
+    if not path.exists("./nmap"):
+        os.mkdir("./nmap")
+    os.system(f"sudo nmap -sS -sV -A {ip} -oA nmap/nmap-scan >/dev/null")
     if noprompt is False:
         try:
             choice = input("Display the results of the Nmap scan? (Yes/No)")
             if choice.lower() == "yes":
-                os.system("cat ./nmap-scan.nmap")
+                os.system("cat ./nmap/nmap-scan.nmap")
         except KeyboardInterrupt:
             print("Keyboard interrupt detected")
         except ValueError:
@@ -36,18 +39,20 @@ def NmapScan(noprompt, ip):
 
 #Run gobuster directory scan
 def DirScan(noprompt, dirwordlist, ip, domainname, port):
+    if not path.exists("./gobuster"):
+        os.mkdir("./gobuster")
     if len(domainname) > 1:
-        os.system(f"gobuster dir -u http://{domainname} -w {dirwordlist} -o dir-scan-results.txt -q >/dev/null") 
+        os.system(f"gobuster dir -u http://{domainname} -w {dirwordlist} -o gobuster/dir-scan-results.txt -q >/dev/null") 
     else:
         if port is not None:    
-            os.system(f"gobuster dir -u http://{ip}:{port} -w {dirwordlist} -o dir-scan-results.txt -q >/dev/null")
+            os.system(f"gobuster dir -u http://{ip}:{port} -w {dirwordlist} -o gobuster/dir-scan-results.txt -q >/dev/null")
         else:
-            os.system(f"gobuster dir -u http://{ip} -w {dirwordlist} -o dir-scan-results.txt -q >/dev/null")
+            os.system(f"gobuster dir -u http://{ip} -w {dirwordlist} -o gobuster/dir-scan-results.txt -q >/dev/null")
     if noprompt is False:
         try:
             choice = input("Display the results of the directory scan()? (Yes/No) ")
             if choice.lower() == "yes":
-                os.system("cat dir-scan-results.txt")
+                os.system("cat gobuster/dir-scan-results.txt")
         except KeyboardInterrupt:
             print("Keyboard interrupt detected")
         except ValueError:
@@ -58,8 +63,10 @@ def DirScan(noprompt, dirwordlist, ip, domainname, port):
 #Run gobuster DNS scan
 def DNSScan(domain, list, *args, **kwargs):
     print("Running DNS Scan...")
+    if not path.exists("./gobuster"):
+        os.mkdir("./gobuster")
     try:
-        os.system(f"gobuster dns -d {domain} -w {list} -o dns-scan-results.txt -q >/dev/null")
+        os.system(f"gobuster dns -d {domain} -w {list} -o gobuster/dns-scan-results.txt -q >/dev/null")
     except KeyboardInterrupt:
         print("Keyboard interrupt detected")
     except ValueError:
@@ -69,8 +76,10 @@ def DNSScan(domain, list, *args, **kwargs):
 
 def VHostScan(url, list, *args, **kwargs):
     print("Running VHOST Scan...")
+    if not os.path.exists("./gobuster"):
+        os.mkdir("./gobuster")
     try:
-        os.system(f"gobuster vhost -u {url} -w {list} -o vhost-scan-results.txt -q >/dev/null")
+        os.system(f"gobuster vhost -u {url} -w {list} -o gobuster/vhost-scan-results.txt -q >/dev/null")
     except KeyboardInterrupt:
         print("Keyboard interrupt detected")
     except ValueError:
@@ -95,7 +104,7 @@ def checkForWebserver(port, noprompt, ip):
         NmapScan(noprompt, ip)
         if port is None:
             open_ports = []
-            tree = ET.parse("./nmap-scan.xml")
+            tree = ET.parse(".nmap/nmap-scan.xml")
             root = tree.getroot()
             for port_elem in root.iter('port'):
                 portno = port_elem.get('portid')
