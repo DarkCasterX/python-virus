@@ -104,7 +104,7 @@ def checkForWebserver(port, noprompt, ip):
         NmapScan(noprompt, ip)
         if port is None:
             open_ports = []
-            tree = ET.parse(".nmap/nmap-scan.xml")
+            tree = ET.parse("./nmap/nmap-scan.xml")
             root = tree.getroot()
             for port_elem in root.iter('port'):
                 portno = port_elem.get('portid')
@@ -112,6 +112,7 @@ def checkForWebserver(port, noprompt, ip):
                     open_ports.append(portno)
             
             for open_port in open_ports:
+                print(open_port)
                 if int(open_port) == 80 or int(open_port) == 443:
                     print("Port 80 or 443 is open, server is likely hosting a web server")
                     return True
