@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+# Requirements: gobuster, nmap, ffuf, nikto
+
 import os
 from os import path
 import argparse
@@ -78,8 +80,11 @@ def VHostScan(url, list, *args, **kwargs):
     print("Running VHOST Scan...")
     if not os.path.exists("./gobuster"):
         os.mkdir("./gobuster")
+    if not os.path.exists("./ffuf"):
+        os.mkdir("./ffuf")
     try:
         os.system(f"gobuster vhost -u {url} -w {list} -o gobuster/vhost-scan-results.txt -q >/dev/null")
+        os.system(f"ffuf -s -c -u http://{url} -w {list} -H 'Host: FUZZ.{url}' -t 200 -fl 10 -o ffuf/ffuf-vhost-scan.txt")
     except KeyboardInterrupt:
         print("Keyboard interrupt detected")
     except ValueError:
@@ -169,13 +174,13 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('ip', help="IP address of server to recon")
     parser.add_argument('dirlist', help="Path of directory wordlist you want to use")
-    parser.add_argument('-d', '--domain', nargs="?", default="", help="optional domain name to use for scanners default: none")
     parser.add_argument('-n', '--do-dns', action="store_true", help="do dns scanning")
-    parser.add_argument('-l', '--dns-list', nargs="?", help="wordlist to use for DNS scanning")
     parser.add_argument('-k', '--do-nikto', action="store_true", help="run nikto scan")
     parser.add_argument('-t', '--no-prompt', action="store_true", help="Disable unnecessary prompts (yes or no) default: yes")
-    parser.add_argument('-p', '--port', nargs='?', default=None, help="Specify port to scan")
     parser.add_argument('-s', '--skip-nmap', action="store_true", help="Skip Nmap scan")
+    parser.add_argument('-l', '--dns-list', nargs="?", help="wordlist to use for DNS scanning")
+    parser.add_argument('-d', '--domain', nargs="?", default="", help="optional domain name to use for scanners default: none")
+    parser.add_argument('-p', '--port', nargs='?', default=None, help="Specify port to scan")
     args = parser.parse_args()
 
     #Store arguments
