@@ -19,7 +19,6 @@ Web server initial recon
 
 """
 
-running_threads = []
 
 #Run Nmap scan
 def NmapScan(noprompt, ip):
@@ -132,7 +131,10 @@ def checkForWebserver(port, noprompt, ip):
         return False
 
 def webServerScan(is_web_server, noprompt, dirwordlist, ip, domainname, port, args, dnslist):
+    running_threads = []
+    
     if is_web_server == True:
+
         #Run scans
         try:
             print("Running directory scan...")
@@ -169,7 +171,7 @@ def webServerScan(is_web_server, noprompt, dirwordlist, ip, domainname, port, ar
 def main():
     #Print banner
     print(banner)
-
+    
     #Parse arguments
     parser = argparse.ArgumentParser()
     parser.add_argument('ip', help="IP address of server to recon")
